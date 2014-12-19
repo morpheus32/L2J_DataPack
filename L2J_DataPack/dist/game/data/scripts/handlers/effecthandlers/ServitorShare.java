@@ -35,24 +35,6 @@ import com.l2jserver.gameserver.model.skills.BuffInfo;
  */
 public final class ServitorShare extends AbstractEffect
 {
-	private static final class ScheduledEffectExitTask implements Runnable
-	{
-		private final L2Character _effected;
-		private final int _skillId;
-		
-		public ScheduledEffectExitTask(L2Character effected, int skillId)
-		{
-			_effected = effected;
-			_skillId = skillId;
-		}
-		
-		@Override
-		public void run()
-		{
-			_effected.stopSkillEffects(false, _skillId);
-		}
-	}
-	
 	public ServitorShare(Condition attachCond, Condition applyCond, StatsSet set, StatsSet params)
 	{
 		super(attachCond, applyCond, set, params);
@@ -76,7 +58,7 @@ public final class ServitorShare extends AbstractEffect
 		final L2Character effected = info.getEffected().isPlayer() ? info.getEffected().getSummon() : info.getEffected().getActingPlayer();
 		if (effected != null)
 		{
-			ThreadPoolManager.getInstance().scheduleEffect(new ScheduledEffectExitTask(effected, info.getSkill().getId()), 100);
+			ThreadPoolManager.getInstance().scheduleEffect(() -> effected.stopSkillEffects(false, info.getSkill().getId()), 100);
 		}
 	}
 }
